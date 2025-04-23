@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lettura Tarocchi</title>
+  <style>
+    body {
+      background: url('https://img.freepik.com/vettori-gratuito/sfondo-di-carte-dei-tarocchi-disegnati-a-mano_79603-2055.jpg?t=st=1745417386~exp=1745420986~hmac=5be967c962589a94ef30502793b4de8c681beebc71ec7edc77855a7f49545ce1&w=996') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #e94560;
+    }
+    .card {
+      width: 100px;
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid #e94560;
+      display: inline-block;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+      position: relative;
+    }
+    .card.selected {
+      border-color: #00adb5;
+    }
+    .card-name {
+      position: absolute;
+      bottom: -25px;
+      width: 100%;
+      color: #fff;
+      font-size: 0.9em;
+      text-shadow: 0 0 5px #000;
+    }
+    #results {
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #paypal-button-container {
+      margin-top: 20px;
+    }
+    #resetBtn {
+      display: none;
+      margin-top: 20px;
+      background-color: #e94560;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+    #resetBtn:hover {
+      background-color: #ff6b81;
+    }
+    #lang-select {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #0f3460;
+      border: none;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    #user-question, #birthdate, #gender-select {
+      width: 80%;
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-family: 'Georgia', serif;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+    }
+    footer a {
+      color: #00adb5;
+      text-decoration: none;
+    }
+    #selected-count {
+      margin-top: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+  <select id="lang-select" onchange="changeLanguage()">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+    <option value="es">Español</option>
+  </select>
+
+  <h1 id="title">Lettura dei Tarocchi</h1>
+  <p id="birthLabel">Inserisci la tua data di nascita:</p>
+  <input type="date" id="birthdate">
+
+  <p id="genderLabel">Seleziona il tuo genere:</p>
+  <select id="gender-select">
+    <option value="male">Uomo</option>
+    <option value="female">Donna</option>
+    <option value="nonbinary">Non binario</option>
+  </select>
+
+  <p id="questionLabel">Scrivi (facoltativo) la tua domanda o il tema della tua lettura:</p>
+  <textarea id="user-question" rows="3" placeholder="Es. Amore, lavoro, spiritualità..."></textarea>
+
+  <p id="chooseLabel">Scegli 3 carte:</p>
+  <div id="deck">
+    <div class="card" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_00_Fool.jpg');"></div>
+    <div class="card" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/9f/RWS_Tarot_01_Magician.jpg');"></div>
+    <div class="card" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/4e/RWS_Tarot_02_The_High_Priestess.jpg');"></div>
+    <!-- Aggiungi qui altre carte se necessario -->
+  </div>
+
+  <div id="selected-count">Carte selezionate: 0/3</div>
+  <button id="readBtn" onclick="handlePayment()">Paga 5€ per Scoprire il tuo destino</button>
+  <div id="paypal-button-container" style="display:none;"></div>
+  <div id="results"></div>
+  <button id="resetBtn" onclick="resetReading()">🔄 Nuova Lettura</button>
+
+  <footer>
+    <p>Seguici su <a href="https://www.facebook.com/profile.php?id=61575162406639" target="_blank">Facebook</a></p>
+  </footer>
+
+  <audio id="bg-audio" loop autoplay>
+    <source src="https://www.bensound.com/bensound-music/bensound-slowmotion.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    // script JS invariato, modifiche nel CSS sopra e nel background
+  </script>
+</body>
+</html>
