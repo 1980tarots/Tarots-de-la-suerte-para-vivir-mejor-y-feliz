@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lettura Tarocchi</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_BUSINESS_CLIENT_ID&currency=EUR"></script>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1604474252857-d29f399a0cf7?crop=entropy&cs=tinysrgb&fit=max&ixid=MXwyMDg1MnwzNjg3OXxjb2xvY3x8c3Rvcnl8ZW58MHx8fHwxNjc5NzQxNjk3&ixlib=rb-1.2.1&q=80&w=1080') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      padding: 20px;
+      backdrop-filter: brightness(0.8);
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #e94560;
+    }
+    .card {
+      width: 100px;
+      height: 150px;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Plain_red_back.svg/120px-Plain_red_back.svg.png'); /* Immagine del retro delle carte */
+      background-size: cover;
+      border: 2px solid #e94560;
+      display: inline-block;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .card.selected {
+      border-color: #00adb5;
+    }
+    #results {
+      margin-top: 30px;
+    }
+    #paypal-button-container {
+      margin-top: 20px;
+    }
+    #lang-select {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #0f3460;
+      border: none;
+      color: #fff;
+      padding: 5px;
+    }
+    #user-question, #birthdate, #gender-select {
+      width: 80%;
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-family: 'Georgia', serif;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+    }
+    footer a {
+      color: #00adb5;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <select id="lang-select" onchange="changeLanguage()">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+    <option value="es">Español</option>
+  </select>
+
+  <h1 id="title">Lettura dei Tarocchi</h1>
+  <p id="birthLabel">Inserisci la tua data di nascita:</p>
+  <input type="date" id="birthdate">
+
+  <p id="genderLabel">Seleziona il tuo genere:</p>
+  <select id="gender-select">
+    <option value="male">Uomo</option>
+    <option value="female">Donna</option>
+    <option value="nonbinary">Non binario</option>
+  </select>
+
+  <p id="questionLabel">Scrivi (facoltativo) la tua domanda o il tema della tua lettura:</p>
+  <textarea id="user-question" rows="3" placeholder="Es. Amore, lavoro, spiritualità..."></textarea>
+
+  <p id="chooseLabel">Scegli 3 carte:</p>
+  <div id="deck"></div>
+  <button id="readBtn" onclick="handlePayment()">Paga 5€ per Scoprire il tuo destino</button>
+  <div id="paypal-button-container" style="display:none;"></div>
+  <div id="results"></div>
+
+  <footer>
+    <p>Seguici su <a href="https://www.facebook.com/profile.php?id=61575162406639" target="_blank">Facebook</a></p>
+  </footer>
+
+  <audio id="bg-audio" loop autoplay>
+    <source src="https://www.bensound.com/bensound-music/bensound-mystery.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    const texts = {
+      it: {
+        title: "Lettura dei Tarocchi",
+        birthLabel: "Inserisci la tua data di nascita:",
+        chooseLabel: "Scegli 3 carte:",
+        readBtn: "Paga 5€ per Scoprire il tuo destino",
+        questionLabel: "Scrivi (facoltativo) la tua domanda o il tema della tua lettura:",
+        genderLabel: "Seleziona il tuo genere:",
+        positions: ["Passato", "Presente", "Futuro"],
+        hopefulMessage: "Ricorda, ogni sfida porta con sé un'opportunità. Il tuo cammino è pieno di luce.",
+        topicMessages: {
+          amore: "Le carte riflettono il tuo bisogno di connessione e amore profondo.",
+          lavoro: "Il tuo cammino professionale è al centro delle energie attuali.",
+          spiritualità: "La tua ricerca interiore illumina la strada verso la consapevolezza."
+        }
+      },
+      en: {
+        title: "Tarot Reading",
+        birthLabel: "Enter your birth date:",
+        chooseLabel: "Choose 3 cards:",
+        readBtn: "Pay €5 to Reveal Your Fate",
+        questionLabel: "Optionally write your question or reading theme:",
+        genderLabel: "Select your gender:",
+        positions: ["Past", "Present", "Future"],
+        hopefulMessage: "Remember, every challenge carries an opportunity. Your path is filled with light.",
+        topicMessages: {
+          love: "The cards reflect your longing for connection and deep love.",
+          work: "Your professional journey is the focus of current energies.",
+          spirituality: "Your inner quest lights the way to awareness."
+        }
+      },
+      es: {
+        title: "Lectura del Tarot",
+        birthLabel: "Introduce tu fecha de nacimiento:",
+        chooseLabel: "Elige 3 cartas:",
+        readBtn: "Paga 5€ para Revelar tu Destino",
+        questionLabel: "Escribe (opcional) tu pregunta o el tema de tu consulta:",
+        genderLabel: "Selecciona tu género:",
+        positions: ["Pasado", "Presente", "Futuro"],
+        hopefulMessage: "Recuerda, cada desafío trae una oportunidad. Tu camino está lleno de luz.",
+        topicMessages: {
+          amor: "Las cartas reflejan tu anhelo de conexión y amor profundo.",
+          trabajo: "Tu camino profesional es el centro de las energías actuales.",
+          espiritualidad: "Tu búsqueda interior ilumina el camino hacia la conciencia."
+        }
+      }
+    };
+
+    let currentLang = 'it';
+    let selected = [];
+
+    const tarotCards = [
+      { name: {it: "Il Matto", en: "The Fool", es: "El Loco"}, meaning: {it: "Nuovi inizi", en: "New beginnings", es: "Nuevos comienzos"} },
+      { name: {it: "Il Mago", en: "The Magician", es: "El Mago"}, meaning: {it: "Potere personale", en: "Personal power", es: "Poder personal"} },
+      { name: {it: "La Papessa", en: "The High Priestess", es: "La Sacerdotisa"}, meaning: {it: "Intuizione", en: "Intuition", es: "Intuición"} },
+      { name: {it: "L’Imperatrice", en: "The Empress", es: "La Emperatriz"}, meaning: {it: "Abbondanza", en: "Abundance", es: "Abundancia"} },
+      { name: {it: "L’Imperatore", en: "The Emperor", es: "El Emperador"}, meaning: {it: "Stabilità", en: "Stability", es: "Estabilidad"} }
+    ];
+
+    function shuffleDeck() {
+      selected = [];
+      const shuffled = [...tarotCards].sort(() => 0.5 - Math.random());
+      const deck = document.getElementById("deck");
+      deck.innerHTML = "";
+      shuffled.forEach((card) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.onclick = () => selectCard(card, div);
+        deck.appendChild(div);
+      });
+    }
+
+    function selectCard(card, element) {
+      if (selected.length >= 3 || element.classList.contains("selected")) return;
+      element.classList.add("selected");
+      selected.push(card);
+    }
+
+    function changeLanguage() {
+      currentLang = document.getElementById("lang-select").value;
+      const t = texts[currentLang];
+      document.getElementById("title").innerText = t.title;
+      document.getElementById("birthLabel").innerText = t.birthLabel;
+      document.getElementById("chooseLabel").innerText = t.chooseLabel;
+      document.getElementById("readBtn").innerText = t.readBtn;
+      document.getElementById("questionLabel").innerText = t.questionLabel;
+      document.getElementById("genderLabel").innerText = t.genderLabel;
+    }
+
+    function handlePayment() {
+      document.getElementById("paypal-button-container").style.display = "block";
+      document.getElementById("readBtn").style.display = "none";
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{ amount: { value: '5.00' } }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            alert("Pagamento effettuato con successo!");
+            showReading();
+          });
+        }
+      }).render('#paypal-button-container');
+    }
+
+    function showReading() {
+      const t = texts[currentLang];
+      let resultText = "<h2>" + t.positions[0] + ": " + selected[0].name[currentLang] + "</h2><p>" + selected[0].meaning[currentLang] + "</p>";
+      resultText += "<h2>" + t.positions[1] + ": " + selected[1].name[currentLang] + "</h2><p>" + selected[1].meaning[currentLang] + "</p>";
+      resultText += "<h2>" + t.positions[2] + ": " + selected[2].name[currentLang] + "</h2><p>" + selected[2].meaning[currentLang] + "</p>";
+      document.getElementById("results").innerHTML = resultText;
+      document.getElementById("results").style.display = "block";
+    }
+
+    shuffleDeck(); // Shuffle the deck when the page loads
+  </script>
+</body>
+</html>
